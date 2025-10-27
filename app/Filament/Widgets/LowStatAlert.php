@@ -23,12 +23,12 @@ class LowStatAlert extends TableWidget
 
     protected function getTableDescription(): ?string
     {
-        return 'Products that need restocking (below 10 units)';
+        return 'Products that need restocking when stock falls below the warning level.';    
     }
 
     protected function getTableQuery(): Builder
     {
-        return Product::query()->where('stock', '<', 10);
+        return Product::query()->whereRaw('stock < stock_warning_level');
     }
 
     protected function getTableColumns(): array
@@ -36,13 +36,17 @@ class LowStatAlert extends TableWidget
         return [
             TextColumn::make('name')->label('Product'),
             TextColumn::make('sku')->label('SKU'),
-            BadgeColumn::make('category.name')
-                ->label('Category')
-                ->colors(['primary']),
+            TextColumn::make('category.name')
+                ->badge()
+                ->label('Category'),
             TextColumn::make('stock')
                 ->label('Stock')
                 ->badge()
                 ->color('danger'),
+            TextColumn::make('stock_warning_level')     
+                ->label('Stock Warning Level')
+                ->badge()
+                ->color('danger'),  
         ];
     }
 }

@@ -40,11 +40,17 @@ class ProductForm
                         ->numeric()
                         ->prefix('₱'),
                 ]),
-               
+
                 TextInput::make('stock')
                     ->required()
                     ->numeric()
                     ->default(0),
+
+                TextInput::make('stock_warning_level')
+                    ->label('Stock Warning Level')
+                    ->hint('The system will alert you when the product quantity falls below this value (default: 10).')
+                    ->numeric()
+                    ->default(10),
             ])->columns(1);
     }
 }

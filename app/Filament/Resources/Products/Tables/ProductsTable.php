@@ -43,6 +43,8 @@ class ProductsTable
                     
                 TextInputColumn::make('stock'),
 
+                TextInputColumn::make('stock_warning_level'),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

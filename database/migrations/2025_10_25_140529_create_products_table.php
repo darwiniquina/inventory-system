@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('cost', 10, 2);
             $table->decimal('price', 10, 2);
             $table->integer('stock')->default(0);
+            $table->integer('stock_warning_level')->default(10);
             $table->timestamps();
         });
     }

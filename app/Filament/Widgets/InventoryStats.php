@@ -14,7 +14,7 @@ class InventoryStats extends BaseWidget
     {
         $totalProducts = Product::count();
         $totalValue = Product::sum(DB::raw('cost * stock'));
-        $lowStockCount = Product::where('stock', '<', 10)->count();
+        $lowStockCount = Product::whereRaw('stock < stock_warning_level')->count();
 
         return [
             Stat::make('Total Products', $totalProducts)
@@ -26,7 +26,7 @@ class InventoryStats extends BaseWidget
                 ->icon('heroicon-o-currency-dollar'),
 
             Stat::make('Low Stock Items', $lowStockCount)
-                ->description('Below 10 units')
+                ->description('Below their units')
                 ->descriptionIcon('heroicon-o-exclamation-triangle')
                 ->color($lowStockCount > 0 ? 'danger' : 'success'),
         ];
