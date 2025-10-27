@@ -4,14 +4,22 @@ namespace App\Filament\Resources\Products\Tables;
 
 use Filament\Tables\Table;
 use Filament\Actions\EditAction;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ExportAction;
 use Filament\Tables\Grouping\Group;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\ReplicateAction;
 use Filament\Forms\Components\Select;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
+use App\Filament\Exports\ProductExporter;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextInputColumn;
+use Illuminate\Console\View\Components\Task;
 
 class ProductsTable
 {
@@ -66,11 +74,30 @@ class ProductsTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    
+                    ReplicateAction::make()
+                    ->requiresConfirmation()
+                    ->modalHeading('Replicate Product')
+                    ->modalDescription('This will create a duplicate of the Product. You can edit it later if needed.')
+                    ->modalSubmitActionLabel('Replicate product')
+                    ->beforeReplicaSaved(function (Model $replica): void {
+                        $replica->name = $replica->name.' (copy)';
+                        $replica->sku = $replica->sku.'-copy';  
+                    }),
+
+                    DeleteAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Delete Product')
+                        ->modalDescription('Are you sure you want to delete this Product? This action cannot be undone and all related to products will also be removed.')
+                        ->modalSubmitActionLabel('Delete Product')
+                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    ExportBulkAction::make()->label('Export')->exporter(ProductExporter::class),
                 ]),
             ]);
     }
