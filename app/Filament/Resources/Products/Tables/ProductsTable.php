@@ -27,12 +27,15 @@ class ProductsTable
                     
                 TextInputColumn::make('sku')
                     ->label('SKU')
-                    ->rules(['required', 'unique']),
+                    ->rules(['required']),
 
                 SelectColumn::make('category_id')
                     ->label('Category')
-                    ->optionsRelationship(name: 'category', titleAttribute: 'name')
-                    ->rules(['required']),
+                    ->optionsRelationship(name: 'category', titleAttribute: 'name'),
+
+                SelectColumn::make('supplier_id')
+                    ->label('Supplier')
+                    ->optionsRelationship(name: 'supplier', titleAttribute: 'name'),
 
                 TextInputColumn::make('cost')->rules(['required']),
 

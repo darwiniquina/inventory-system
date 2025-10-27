@@ -17,14 +17,18 @@ class ProductForm
                     ->required(),
                 
                 TextInput::make('sku')
-                    ->unique()
                     ->label('SKU')
+                    ->unique()
                     ->required(),
                 
                 Select::make('category_id')
                     ->relationship(name: 'category', titleAttribute: 'name')  
                     ->nullable(),
-                
+
+                Select::make('supplier_id')
+                    ->relationship(name: 'supplier', titleAttribute: 'name')  
+                    ->nullable(),
+
                 Grid::make()->columnSpan(1)->columns(2)->schema([
                     TextInput::make('cost')
                         ->required()
