@@ -27,18 +27,17 @@ class DatabaseSeeder extends Seeder
 
         // --- Categories ---
         $categories = [
-            ['id' => 1, 'name' => 'Electronics', 'created_at' => $now, 'updated_at' => $now],
-            ['id' => 2, 'name' => 'Furniture', 'created_at' => $now, 'updated_at' => $now],
-            ['id' => 3, 'name' => 'Office Supplies', 'created_at' => $now, 'updated_at' => $now],
-            ['id' => 4, 'name' => 'Lighting', 'created_at' => $now, 'updated_at' => $now],
-            ['id' => 5, 'name' => 'Accessories', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Electronics', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Furniture', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Office Supplies', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Lighting', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Accessories', 'created_at' => $now, 'updated_at' => $now],
         ];
         DB::table('categories')->insert($categories);
 
         // --- Suppliers ---
         $suppliers = [
             [
-                'id' => 1,
                 'name' => 'BrightTech Distributors',
                 'contact_person' => 'Jane Torres',
                 'email' => 'sales@brighttech.com',
@@ -51,7 +50,6 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'id' => 2,
                 'name' => 'FurniWorks Ltd.',
                 'contact_person' => 'Marcus Lee',
                 'email' => 'contact@furniworks.co',
@@ -64,7 +62,6 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'id' => 3,
                 'name' => 'OfficeBase',
                 'contact_person' => 'Nora Patel',
                 'email' => 'nora@officebase.com',
@@ -82,7 +79,6 @@ class DatabaseSeeder extends Seeder
         // --- Products ---
         $products = [
             [
-                'id' => 1,
                 'name' => 'USB-C Cable',
                 'category_id' => 1,
                 'supplier_id' => 1,
@@ -94,7 +90,6 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'id' => 2,
                 'name' => 'Desk Lamp',
                 'category_id' => 4,
                 'supplier_id' => 2,
@@ -106,7 +101,6 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'id' => 3,
                 'name' => 'Office Chair',
                 'category_id' => 2,
                 'supplier_id' => 2,
@@ -118,7 +112,6 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'id' => 4,
                 'name' => 'Notebook Pack',
                 'category_id' => 3,
                 'supplier_id' => 3,
