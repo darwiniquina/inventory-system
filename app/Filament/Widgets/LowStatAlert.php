@@ -14,8 +14,6 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 
 class LowStatAlert extends TableWidget
 {
-   protected int|string|array $columnSpan = 'full';
-   
    protected function getTableHeading(): string
     {
         return 'Low Stock Alert';
