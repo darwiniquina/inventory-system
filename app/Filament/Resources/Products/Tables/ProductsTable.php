@@ -2,75 +2,89 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
-use App\Filament\Exports\ProductExporter;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ExportBulkAction;
-use Filament\Actions\ReplicateAction;
-use Filament\Tables\Columns\SelectColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\TextInputColumn;
-use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Grouping\Group;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\ReplicateAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ExportBulkAction;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\TextInput;
+use App\Filament\Exports\ProductExporter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\SelectColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Columns\Summarizers\Sum;
+use Filament\Tables\Columns\TextInputColumn;
+use Filament\Tables\Columns\Summarizers\Average;
+use Filament\Tables\Concerns\InteractsWithTable;
 
 class ProductsTable
 {
+    use InteractsWithTable;
+
     public static function configure(Table $table): Table
     {
+        $showSummaries = false;
         return $table
             ->columns([
                 TextInputColumn::make('name')
-                    ->searchable(query: function ($query, $search) {
-                        $query->where('products.name', 'ILIKE', "%{$search}%");
-                    })
+                    ->searchable(isIndividual: true)
                     ->rules(['required']),
 
                 TextInputColumn::make('sku')
-                    ->searchable()
                     ->label('SKU')
+                    ->searchable(isIndividual: true)
                     ->rules(['required']),
 
                 SelectColumn::make('category_id')
-                    ->searchable()
                     ->label('Category')
-                    ->optionsRelationship(name: 'category', titleAttribute: 'name'),
+                    ->optionsRelationship('category', 'name'),
 
                 SelectColumn::make('supplier_id')
-                    ->searchable()
                     ->label('Supplier')
-                    ->optionsRelationship(name: 'supplier', titleAttribute: 'name'),
+                    ->optionsRelationship('supplier', 'name'),
 
-                TextInputColumn::make('cost')->rules(['required']),
+                TextInputColumn::make('cost')
+                    ->rules(['required'])
+                    ->summarize([
+                        Sum::make()->label('Sum. Cost')->hidden(fn (Table $table) => ! $table->getLivewire()->showSummaries),
+                        Average::make()->label('Avg. Cost')->hidden(fn (Table $table) => ! $table->getLivewire()->showSummaries)
+                    ]),
 
-                TextInputColumn::make('price')->rules(['required']),
+                TextInputColumn::make('price')
+                    ->rules(['required'])
+                    ->summarize([
+                        Sum::make()->label('Sum. Price')->hidden(fn (Table $table) => ! $table->getLivewire()->showSummaries),
+                        Average::make()->label('Avg. Price')->hidden(fn (Table $table) => ! $table->getLivewire()->showSummaries)
+                    ]),
 
                 TextColumn::make('stock')
                     ->badge()
-                    ->color(function (Model $record): string {
-                        if ($record->stock <= 0) {
-                            return 'danger';
-                        }
-
-                        if ($record->stock <= $record->stock_warning_level) {
-                            return 'warning';
-                        }
-
-                        return 'success';
+                    ->summarize([
+                        Sum::make()->label('Sum. Stock')->hidden(fn (Table $table) => ! $table->getLivewire()->showSummaries),
+                        Average::make()->label('Avg. Stock')->hidden(fn (Table $table) => ! $table->getLivewire()->showSummaries)
+                    ])
+                    ->color(fn (Model $record): string => match (true) {
+                        $record->stock <= 0 => 'danger',
+                        $record->stock <= $record->stock_warning_level => 'warning',
+                        default => 'success',
                     })
-                    ->tooltip(function (Model $record): ?string {
-                        if ($record->stock <= 0) {
-                            return "{$record->stock} — Out of stock";
-                        }
-
-                        if ($record->stock <= $record->stock_warning_level) {
-                            return "{$record->stock} — Low stock";
-                        }
-
-                        return "{$record->stock} — Healthy";
+                    ->tooltip(fn (Model $record): ?string => match (true) {
+                        $record->stock <= 0 => "{$record->stock} — Out of stock",
+                        $record->stock <= $record->stock_warning_level => "{$record->stock} — Low stock",
+                        default => "{$record->stock} — Healthy",
                     })
                     ->sortable(),
 
@@ -86,15 +100,53 @@ class ProductsTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->searchPlaceholder('Search (Name, SKU)')
             ->striped()
-            ->paginatedWhileReordering(false)
+            ->defaultSort('created_at', 'desc')
             ->reorderableColumns()
+            ->persistFiltersInSession()
             ->groupingSettingsInDropdownOnDesktop()
             ->groups([
                 Group::make('category.name')->collapsible()->titlePrefixedWithLabel(false),
+                Group::make('supplier.name')->collapsible()->titlePrefixedWithLabel(false),
             ])
             ->filters([
-            ])
+                Filter::make('stock_level')
+                    ->schema([
+                        Select::make('stock_level')->options([
+                            'out_of_stock' => 'Out of stock',
+                            'low_stock' => 'Low stock',
+                            'healthy' => 'Healthy',
+                        ]),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['stock_level'] === 'out_of_stock', fn ($q) => $q->where('stock', '<=', 0))
+                            ->when($data['stock_level'] === 'low_stock', fn ($q) => $q->whereRaw('stock <= stock_warning_level'))
+                            ->when($data['stock_level'] === 'healthy', fn ($q) => $q->whereRaw('stock > stock_warning_level'));
+                    }),
+
+                SelectFilter::make('category')
+                    ->label('Category')
+                    ->multiple()
+                    ->relationship('category', 'name'),
+
+                SelectFilter::make('supplier')
+                    ->label('Supplier')
+                    ->multiple()
+                    ->relationship('supplier', 'name'),
+
+                Filter::make('created_at')
+                    ->schema([
+                        DatePicker::make('from')->label('From'),
+                        DatePicker::make('until')->label('To'),
+                    ])
+                    ->columns(2)
+                    ->query(fn (Builder $query, array $data) => $query
+                        ->when($data['from'], fn ($q, $date) => $q->whereDate('created_at', '>=', $date))
+                        ->when($data['until'], fn ($q, $date) => $q->whereDate('created_at', '<=', $date))
+                    ),
+                ])
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make(),
@@ -102,18 +154,18 @@ class ProductsTable
                     ReplicateAction::make()
                         ->requiresConfirmation()
                         ->modalHeading('Replicate Product')
-                        ->modalDescription('This will create a duplicate of the product with zero stock, You can edit it later if needed.')
+                        ->modalDescription('Creates a duplicate product with zero stock.')
                         ->modalSubmitActionLabel('Replicate product')
-                        ->beforeReplicaSaved(function (Model $replica): void {
-                            $replica->name = $replica->name.' (copy)';
-                            $replica->sku = $replica->sku.'-copy';
-                            $replica->stock = 0;
-                        }),
+                        ->beforeReplicaSaved(fn (Model $replica) => [
+                            $replica->name = $replica->name . ' (copy)',
+                            $replica->sku = $replica->sku . '-copy',
+                            $replica->stock = 0,
+                        ]),
 
                     DeleteAction::make()
                         ->requiresConfirmation()
                         ->modalHeading('Delete Product')
-                        ->modalDescription('Are you sure you want to delete this Product? This action cannot be undone and all related to products will also be removed.')
+                        ->modalDescription('This action cannot be undone.')
                         ->modalSubmitActionLabel('Delete Product'),
                 ]),
             ])
@@ -122,6 +174,27 @@ class ProductsTable
                     DeleteBulkAction::make(),
                     ExportBulkAction::make()->label('Export')->exporter(ProductExporter::class),
                 ]),
+            ])
+            ->headerActions([
+                Action::make('toggleSummaries')
+                    ->label('Summary')
+                    ->icon(fn (Table $table): string =>
+                        $table->getLivewire()->showSummaries
+                            ? 'heroicon-o-eye-slash'
+                            : 'heroicon-o-eye'
+                    )
+                    ->button()
+                    ->action(function (Table $table): void {
+                        $livewire = $table->getLivewire();
+                        $newValue = ! $livewire->showSummaries;
+
+                        $livewire->showSummaries = $newValue;
+                        session(['showSummaries' => $newValue]);
+                    }),
+
+                CreateAction::make()
+                ->label('New')
+                 ->icon(Heroicon::OutlinedPlus),
             ]);
     }
 }

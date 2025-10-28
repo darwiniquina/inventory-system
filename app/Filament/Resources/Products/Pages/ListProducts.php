@@ -9,11 +9,18 @@ use Filament\Resources\Pages\ListRecords;
 class ListProducts extends ListRecords
 {
     protected static string $resource = ProductResource::class;
+    public bool $showSummaries = false;
 
+    
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
         ];
+    }
+
+    public function mount(): void
+    {
+        parent::mount();
+        $this->showSummaries = session('showSummaries', false);
     }
 }
