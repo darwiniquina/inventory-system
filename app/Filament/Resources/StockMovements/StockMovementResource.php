@@ -18,9 +18,7 @@ class StockMovementResource extends Resource
 {
     protected static ?string $model = StockMovement::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    protected static ?string $recordTitleAttribute = 'Stock Movements';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ArrowsRightLeft;
 
     public static function form(Schema $schema): Schema
     {
@@ -43,7 +41,7 @@ class StockMovementResource extends Resource
     {
         return [
             'index' => ListStockMovements::route('/'),
-            // 'create' => CreateStockMovement::route('/create'),
+            // 'create' =>  ::route('/create'),
             // 'edit' => EditStockMovement::route('/{record}/edit'),
         ];
     }
