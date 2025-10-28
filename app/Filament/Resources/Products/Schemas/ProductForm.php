@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Products\Schemas;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
 
 class ProductForm
 {
@@ -15,18 +15,18 @@ class ProductForm
             ->components([
                 TextInput::make('name')
                     ->required(),
-                
+
                 TextInput::make('sku')
                     ->label('SKU')
                     ->unique()
                     ->required(),
-                
+
                 Select::make('category_id')
-                    ->relationship(name: 'category', titleAttribute: 'name')  
+                    ->relationship(name: 'category', titleAttribute: 'name')
                     ->nullable(),
 
                 Select::make('supplier_id')
-                    ->relationship(name: 'supplier', titleAttribute: 'name')  
+                    ->relationship(name: 'supplier', titleAttribute: 'name')
                     ->nullable(),
 
                 Grid::make()->columnSpan(1)->columns(2)->schema([
@@ -41,16 +41,19 @@ class ProductForm
                         ->prefix('₱'),
                 ]),
 
-                TextInput::make('stock')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-
                 TextInput::make('stock_warning_level')
                     ->label('Stock Warning Level')
                     ->hint('The system will alert you when the product quantity falls below this value (default: 10).')
                     ->numeric()
                     ->default(10),
+
+                TextInput::make('stock')
+                    ->label('Current Stock')
+                    ->hint('This value is managed automatically through stock movements and cannot be edited directly.')
+                    ->required()
+                    ->numeric()
+                    ->default(0)
+                    ->disabled(),
             ])->columns(1);
     }
 }

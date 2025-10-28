@@ -2,14 +2,13 @@
 
 namespace App\Filament\Resources\StockMovements\Tables;
 
-use Filament\Tables\Table;
 use App\Enums\StockMovementEnum;
-use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\SelectColumn;
-use Filament\Tables\Columns\TextInputColumn;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class StockMovementsTable
 {
@@ -17,37 +16,34 @@ class StockMovementsTable
     {
         return $table
             ->columns([
-                SelectColumn::make('product_id')
-                    ->label('Product')
-                    ->optionsRelationship(name: 'product', titleAttribute: 'name')
-                    ->rules(['required']),
-                SelectColumn::make('type') 
-                    ->options([
-                        StockMovementEnum::IN => 'Stock (In)',
-                        StockMovementEnum::OUT => 'Stock (Remove)',
-                        StockMovementEnum::ADJUSTMENT => 'Adjustment',
-                    ])
-                    ->searchable(),
-                TextInputColumn::make('quantity')
-                    ->sortable(),
-                TextInputColumn::make('reason')
-                    ->searchable(),
-                TextColumn::make('user.name')
-                    ->searchable(),
+                TextColumn::make('product.name')->searchable(),
+                TextColumn::make('product.sku')->searchable(),
+                TextColumn::make('type')
+                    ->badge()
+                    ->color(fn (Model $record): string => match ($record->type) {
+                        StockMovementEnum::IN => 'success',
+                        StockMovementEnum::OUT => 'danger',
+                        StockMovementEnum::ADJUSTMENT_IN => 'warning',
+                        StockMovementEnum::ADJUSTMENT_OUT => 'warning',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => Str::of($state)
+                        ->replace('_', ' ')
+                        ->title()
+                    ),
+                TextColumn::make('quantity')->badge()->sortable(),
+                TextColumn::make('reason'),
+                TextColumn::make('user.name'),
+
                 TextColumn::make('created_at')
                     ->dateTime()
+                    ->since()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
+            ->defaultSort('created_at', 'desc')
             ->recordActions([
-                EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
