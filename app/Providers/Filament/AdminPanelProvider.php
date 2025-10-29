@@ -2,27 +2,25 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Panel;
-use Filament\PanelProvider;
-use Filament\Pages\Dashboard;
-use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use App\Filament\Widgets\LowStatAlert;
 use App\Filament\Widgets\InventoryStats;
-use Filament\Widgets\FilamentInfoWidget;
-use Filament\Http\Middleware\Authenticate;
-use App\Filament\Widgets\StockOverviewChart;
-use App\Filament\Widgets\RecentStockMovements;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Cookie\Middleware\EncryptCookies;
+use App\Filament\Widgets\LowStatAlert;
 use App\Filament\Widgets\ProductMovementInsights;
+use App\Filament\Widgets\RecentStockMovements;
+use App\Filament\Widgets\StockOverviewChart;
+use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Filament\Pages\Dashboard;
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -33,6 +31,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->registration()
+            ->passwordReset()
+            ->emailVerification()
+            ->profile()
             ->databaseNotifications()
             ->databaseNotificationsPolling(null)
             ->colors([
