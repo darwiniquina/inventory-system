@@ -77,6 +77,7 @@
                 padding: 0.5rem 0.25rem;
                 border-bottom: 1px solid rgba(90, 90, 90, 0.25);
                 transition: background-color 0.12s ease;
+                gap: 0.5rem;
             }
 
             .pm-item:hover {
@@ -99,12 +100,13 @@
             .pm-badge.green {
                 color: #064e3b;
                 background: #bbf7d0;
+                font-size: 0.7rem;
             }
 
             .pm-badge.amber {
                 color: #7c2d12;
                 background: #fed7aa;
-                font-size: 0.9rem;
+                font-size: 0.6rem;
             }
 
             .pm-empty {
