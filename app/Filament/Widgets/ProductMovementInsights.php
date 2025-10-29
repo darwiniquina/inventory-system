@@ -2,18 +2,19 @@
 
 namespace App\Filament\Widgets;
 
-use Carbon\Carbon;
-use App\Models\Product;
-use Filament\Widgets\Widget;
-use App\Models\StockMovement;
 use App\Enums\StockMovementEnum;
+use App\Models\Product;
+use App\Models\StockMovement;
+use Carbon\Carbon;
+use Filament\Widgets\Widget;
 use Illuminate\Support\Facades\DB;
 
 class ProductMovementInsights extends Widget
 {
+    protected ?string $maxHeight = '21.5rem';
+
     protected string $view = 'filament.widgets.product-movement-insights';
-    
-    
+
     public function getData(): array
     {
         $days = 30;
@@ -30,8 +31,8 @@ class ProductMovementInsights extends Widget
         $slowMovers = Product::whereDoesntHave('movements', function ($q) use ($days) {
             $q->where('created_at', '>=', Carbon::now()->subDays($days));
         })
-        ->limit(5)
-        ->get();
+            ->limit(5)
+            ->get();
 
         return [
             'fastMovers' => $fastMovers,

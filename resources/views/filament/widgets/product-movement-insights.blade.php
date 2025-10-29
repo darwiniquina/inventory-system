@@ -7,114 +7,147 @@
 
 <x-filament-widgets::widget>
     <x-filament::section>
-        <style>
-            .pm-insights-widget {
-                color: #e6e6e6;
-            }
+     <style>
+    /* Base (light mode) */
+    .pm-insights-widget {
+        height: 21rem;
+        color: #1e1e1e;
+    }
 
-            .pm-insights-title {
-                color: #9be7b8;
-                margin-bottom: 1rem;
-                font-size: 1.125rem;
-                font-weight: 800;
-            }
+    .pm-insights-title {
+        color: #047857;
+        margin-bottom: 1rem;
+        font-size: 1.125rem;
+        font-weight: 800;
+    }
 
-            .pm-grid {
-                display: grid;
-                grid-gap: 1.5rem;
-                grid-template-columns: 1fr;
-            }
+    .pm-grid {
+        display: grid;
+        grid-gap: 1.5rem;
+        grid-template-columns: 1fr;
+    }
 
-            @media (min-width: 768px) {
-                .pm-grid {
-                    grid-template-columns: 1fr 1fr;
-                }
-            }
+    @media (min-width: 768px) {
+        .pm-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
 
-            .pm-card {
-                background: rgba(20, 20, 20, 0.7);
-                border: 1px solid rgba(90, 90, 90, 0.35);
-                padding: 1rem;
-                border-radius: 10px;
-                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
-            }
+    .pm-card {
+        background: #f9fafb;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        padding: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
 
-            .pm-header {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                margin-bottom: 0.75rem;
-                font-size: 1rem;
-                font-weight: 700;
-            }
+    .pm-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 1rem;
+        font-weight: 700;
+    }
 
-            .pm-header .icon {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 20px;
-                height: 20px;
-            }
+    .pm-header .icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+    }
 
-            .pm-fast-title {
-                color: #10b981;
-            }
+    .pm-fast-title {
+        color: #10b981;
+    }
 
-            .pm-slow-title {
-                color: #f59e0b;
-            }
+    .pm-slow-title {
+        color: #f59e0b;
+    }
 
+    .pm-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
 
-            .pm-list {
-                list-style: none;
-                margin: 0;
-                padding: 0;
-            }
+    .pm-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0.25rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        transition: background-color 0.12s ease;
+        gap: 0.5rem;
+    }
 
-            .pm-item {
-                display: flex;
-                justify-content: space-between;
-                padding: 0.5rem 0.25rem;
-                border-bottom: 1px solid rgba(90, 90, 90, 0.25);
-                transition: background-color 0.12s ease;
-                gap: 0.5rem;
-            }
+    .pm-item:hover {
+        background: rgba(0, 0, 0, 0.03);
+    }
 
-            .pm-item:hover {
-                background: rgba(120, 120, 120, 0.06);
-            }
+    .pm-item .name {
+        color: #111827;
+    }
 
-            .pm-item .name {
-                color: #ffffff;
-            }
+    .pm-badge {
+        display: inline-block;
+        min-width: 2.25rem;
+        padding: 0.15rem 0.5rem;
+        text-align: right;
+        font-weight: 600;
+        border-radius: 6px;
+    }
 
-            .pm-badge {
-                display: inline-block;
-                min-width: 2.25rem;
-                padding: 0.15rem 0.5rem;
-                text-align: right;
-                font-weight: 600;
-                border-radius: 6px;
-            }
+    .pm-badge.green {
+        color: #064e3b;
+        background: #bbf7d0;
+        font-size: 0.7rem;
+    }
 
-            .pm-badge.green {
-                color: #064e3b;
-                background: #bbf7d0;
-                font-size: 0.7rem;
-            }
+    .pm-badge.amber {
+        color: #7c2d12;
+        background: #fed7aa;
+        font-size: 0.6rem;
+    }
 
-            .pm-badge.amber {
-                color: #7c2d12;
-                background: #fed7aa;
-                font-size: 0.6rem;
-            }
+    .pm-empty {
+        padding: 0.5rem;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
 
-            .pm-empty {
-                padding: 0.5rem;
-                color: #9aa0a6;
-                font-size: 0.9rem;
-            }
-        </style>
+    /* Dark Mode Overrides */
+    .dark .pm-insights-widget {
+        color: #e6e6e6;
+    }
+
+    .dark .pm-insights-title {
+        color: #9be7b8;
+    }
+
+    .dark .pm-card {
+        background: rgba(20, 20, 20, 0.7);
+        border: 1px solid rgba(90, 90, 90, 0.35);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    }
+
+    .dark .pm-item {
+        border-bottom: 1px solid rgba(90, 90, 90, 0.25);
+    }
+
+    .dark .pm-item:hover {
+        background: rgba(120, 120, 120, 0.06);
+    }
+
+    .dark .pm-item .name {
+        color: #ffffff;
+    }
+
+    .dark .pm-empty {
+        color: #9aa0a6;
+    }
+</style>
+
 
         <div class="pm-insights-widget">
             <h2 class="pm-insights-title">Inventory Movement Insights</h2>
